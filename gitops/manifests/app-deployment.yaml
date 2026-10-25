@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-workload
+  namespace: production
+  labels:
+    app: api-workload
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-workload
+  template:
+    metadata:
+      labels:
+        app: api-workload
+    spec:
+      containers:
+        - name: app
+          image: mcr.microsoft.com/dotnet/samples:aspnetapp
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"

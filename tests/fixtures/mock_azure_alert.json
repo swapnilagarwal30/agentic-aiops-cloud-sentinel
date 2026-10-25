@@ -1,0 +1,34 @@
+{
+  "schemaId": "azureMonitorCommonAlertSchema",
+  "data": {
+    "essentials": {
+      "alertId": "/subscriptions/sub-prod-01/providers/Microsoft.AlertsManagement/alerts/alt-cpu-spike-99",
+      "alertRule": "High CPU & Memory Saturation on App Workload",
+      "severity": "Sev1",
+      "signalType": "Metric",
+      "monitorCondition": "Fired",
+      "monitoringService": "Platform",
+      "alertTargetIDs": [
+        "/subscriptions/sub-prod-01/resourceGroups/rg-prod-eastus-spoke-app/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-prod-api"
+      ],
+      "firedDateTime": "2026-10-25T14:30:00Z",
+      "description": "Virtual Machine Scale Set CPU exceeds 95% threshold for 15 consecutive minutes with memory pool starvation."
+    },
+    "alertContext": {
+      "conditionType": "SingleResourceMultipleMetricCriteria",
+      "condition": {
+        "windowSize": "PT15M",
+        "allOf": [
+          {
+            "metricName": "Percentage CPU",
+            "metricNamespace": "Microsoft.Compute/virtualMachineScaleSets",
+            "operator": "GreaterThan",
+            "threshold": "95",
+            "timeAggregation": "Average",
+            "metricValue": 98.4
+          }
+        ]
+      }
+    }
+  }
+}

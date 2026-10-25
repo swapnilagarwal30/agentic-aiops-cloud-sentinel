@@ -1,0 +1,26 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+ai_engine:
+  provider: "azure_openai"
+  model: "gpt-4o"
+  temperature: 0.1
+  azure_openai_endpoint: "https://aoai-prod-eastus.openai.azure.com/"
+  azure_openai_api_version: "2024-02-15-preview"
+  deployment_name: "gpt-4o-sre"
+
+azure_telemetry:
+  workspace_id: "12345678-abcd-ef01-2345-6789abcdef01"
+  query_lookback_minutes: 60
+  correlation_threshold: 0.85
+
+gitops_remediation:
+  github_repo: "swapnilagarwal30/azure-enterprise-landingzone-tf"
+  target_branch: "main"
+  auto_create_pr: true
+  auto_merge: false
+  pr_labels:
+    - "agentic-aiops"
+    - "automated-remediation"
+    - "incident-fix"

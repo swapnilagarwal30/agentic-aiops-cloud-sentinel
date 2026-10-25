@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn>=0.29.0
+pydantic>=2.7.0
+pygithub>=2.3.0
+pyyaml>=6.0.1
+requests>=2.31.0
+langchain>=0.1.16
+langchain-openai>=0.1.4
+azure-monitor-query>=1.2.0
+azure-identity>=1.16.0
+pytest>=8.1.0
