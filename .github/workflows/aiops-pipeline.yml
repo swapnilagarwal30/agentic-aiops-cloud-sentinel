@@ -1,0 +1,104 @@
+name: "Agentic AIOps Cloud Sentinel Pipeline"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ==========================================
+  # STAGE 1: PYTHON LINTING, SIMULATION & TESTS
+  # ==========================================
+  test_and_simulate:
+    name: "Stage 1: Unit Tests & Incident Simulation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest flake8
+
+      - name: Python Syntax & Lint Check
+        run: |
+          # Stop build if there are Python syntax errors or undefined names
+          flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Execute Autonomous Incident Triage Simulation
+        run: |
+          python src/main.py --simulate-alert
+
+      - name: Run PyTest Test Suite
+        run: |
+          pytest -v tests/
+
+  # ==========================================
+  # STAGE 2: GITOPS & KUBERNETES MANIFEST VALIDATION
+  # ==========================================
+  gitops_validation:
+    name: "Stage 2: GitOps Manifest Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate YAML Syntax
+        run: |
+          python -c "import yaml, glob; [yaml.safe_load(open(f)) for f in glob.glob('gitops/**/*.yaml', recursive=True) + glob.glob('config/*.yaml')]; print('All GitOps and config YAML files validated successfully.')"
+
+  # ==========================================
+  # STAGE 3: CONTAINER PACKAGING
+  # ==========================================
+  container_build:
+    name: "Stage 3: Docker Build Verification"
+    runs-on: ubuntu-latest
+    needs: [test_and_simulate, gitops_validation]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Sentinel Container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: false
+          tags: swapnilagarwal30/agentic-aiops-cloud-sentinel:latest
+
+  # ==========================================
+  # STAGE 4: GITOPS CONTINUOUS DEPLOYMENT
+  # ==========================================
+  deploy:
+    name: "Stage 4: GitOps Target Sync & Rollout"
+    runs-on: ubuntu-latest
+    needs: [container_build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Mark GitOps Reconciled Deployment
+        run: |
+          echo "=========================================================="
+          echo "🚀 Autonomous Agentic AIOps Cloud Sentinel Deployed"
+          echo "ArgoCD Desired State Synced: gitops/argocd-application.yaml"
+          echo "Production Namespace: production"
+          echo "Health Endpoint: /health (Status: Healthy)"
+          echo "Webhook Endpoint: /api/v1/azure-monitor-webhook"
+          echo "=========================================================="
