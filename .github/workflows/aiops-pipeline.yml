@@ -17,6 +17,8 @@ jobs:
   test_and_simulate:
     name: "Stage 1: Unit Tests & Incident Simulation"
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -102,3 +104,4 @@ jobs:
           echo "Health Endpoint: /health (Status: Healthy)"
           echo "Webhook Endpoint: /api/v1/azure-monitor-webhook"
           echo "=========================================================="
+
